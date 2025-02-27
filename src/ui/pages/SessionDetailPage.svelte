@@ -114,7 +114,7 @@
         {:else}
           <div class="no-picture">No before picture available</div>
         {/if}
-        }
+      
       </div>
       
       <div class="picture-box">

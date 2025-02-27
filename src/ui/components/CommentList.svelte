@@ -20,10 +20,10 @@
           <div class="comment-text">{comment.text}</div>
         </li>
       {/each}
-      }
+      
     </ul>
   {/if}
-  }
+  
 </div>
 
 <style>

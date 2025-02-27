@@ -15,13 +15,12 @@
   function handleCapture(event: CustomEvent) {
     afterPictureData = event.detail.imageData;
   }
+
+  function handleSkip() {
+    afterPictureData = '';
+  }
   
   async function completeSession() {
-    if (!afterPictureData) {
-      error = 'Please take an after picture';
-      return;
-    }
-    
     error = '';
     isEnding = true;
     
@@ -45,7 +44,7 @@
   {/if}
   
   <div class="form-group">
-    <label>After Picture</label>
+    <label>After Picture (Optional)</label>
     {#if afterPictureData}
       <div class="picture-preview">
         <img src={afterPictureData} alt="After" />
@@ -54,16 +53,19 @@
         </button>
       </div>
     {:else}
-      <CameraCapture on:capture={handleCapture} />
+      <CameraCapture 
+        on:capture={handleCapture}
+        on:skip={handleSkip}
+        optional={true}
+      />
     {/if}
-
   </div>
   
   <div class="form-actions">
     <button 
       class="complete-button" 
       on:click={completeSession} 
-      disabled={isEnding || !afterPictureData}
+      disabled={isEnding}
     >
       {isEnding ? 'Completing...' : 'Complete Session'}
     </button>

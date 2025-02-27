@@ -15,6 +15,10 @@
   function handleCapture(event: CustomEvent) {
     beforePictureData = event.detail.imageData;
   }
+
+  function handleSkip() {
+    beforePictureData = ''; // Clear any existing picture data
+  }
   
   async function startSession() {
     if (!title.trim()) {
@@ -24,11 +28,6 @@
     
     if (goalTime <= 0) {
       error = 'Goal time must be greater than zero';
-      return;
-    }
-    
-    if (!beforePictureData) {
-      error = 'Please take a before picture';
       return;
     }
     
@@ -79,7 +78,7 @@
   </div>
   
   <div class="form-group">
-    <label>Before Picture</label>
+    <label>Before Picture (Optional)</label>
     {#if beforePictureData}
       <div class="picture-preview">
         <img src={beforePictureData} alt="Before" />
@@ -88,16 +87,19 @@
         </button>
       </div>
     {:else}
-      <CameraCapture on:capture={handleCapture} />
+      <CameraCapture 
+        on:capture={handleCapture} 
+        on:skip={handleSkip}
+        optional={true} 
+      />
     {/if}
-  
   </div>
   
   <div class="form-actions">
     <button 
       class="start-button" 
       on:click={startSession} 
-      disabled={isCreating || !title || !beforePictureData}
+      disabled={isCreating || !title}
     >
       {isCreating ? 'Starting...' : 'Start Session'}
     </button>
