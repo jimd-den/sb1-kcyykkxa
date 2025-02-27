@@ -6,6 +6,7 @@
   
   let videoElement: HTMLVideoElement;
   let canvasElement: HTMLCanvasElement;
+  let fileInput: HTMLInputElement;
   let cameraInitialized = false;
   let cameraError = '';
   
@@ -53,6 +54,36 @@
       cameraError = 'Failed to capture image';
     }
   }
+
+  function handleFileUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      cameraError = 'Please select an image file';
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        canvasElement.width = img.width;
+        canvasElement.height = img.height;
+        const ctx = canvasElement.getContext('2d');
+        ctx?.drawImage(img, 0, 0);
+        const imageData = canvasElement.toDataURL('image/jpeg');
+        dispatch('capture', { imageData });
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    
+    // Reset input so the same file can be selected again
+    input.value = '';
+  }
 </script>
 
 <div class="camera-container">
@@ -69,9 +100,20 @@
       <button class="capture-button" on:click={takePicture} disabled={!cameraInitialized}>
         Take Photo
       </button>
+      <div class="upload-control">
+        <label for="fileUpload" class="upload-button">
+          Upload Photo
+        </label>
+        <input
+          id="fileUpload"
+          bind:this={fileInput}
+          type="file"
+          accept="image/*"
+          on:change={handleFileUpload}
+        />
+      </div>
     </div>
   {/if}
-  }
 </div>
 
 <style>
@@ -92,6 +134,7 @@
     margin-top: 1rem;
     display: flex;
     justify-content: center;
+    gap: 1rem;
   }
   
   .capture-button {
@@ -120,5 +163,30 @@
     background-color: #f8d7da;
     border-radius: 8px;
     color: #721c24;
+  }
+
+  .upload-control {
+    position: relative;
+  }
+
+  .upload-button {
+    display: inline-block;
+    background-color: #2196F3;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .upload-button:hover {
+    background-color: #1976D2;
+  }
+
+  input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
   }
 </style>

@@ -124,7 +124,6 @@
         {:else}
           <div class="no-picture">No after picture available</div>
         {/if}
-        }
       </div>
     </div>
     
@@ -132,7 +131,6 @@
       <CommentList comments={session.comments} />
     </div>
   {/if}
-  }
 </div>
 
 <style>

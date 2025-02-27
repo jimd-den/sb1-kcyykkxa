@@ -74,7 +74,6 @@
         on:back={navigateToPastSessions} 
       />
     {/if}
-    }
   </div>
 </main>
 

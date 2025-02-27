@@ -55,6 +55,12 @@ export class LocalStorageSessionRepository implements SessionRepository {
     }
   }
 
+  async deleteSession(sessionId: string): Promise<void> {
+    const sessions = this.getSessions();
+    const filteredSessions = sessions.filter(s => s.sessionId !== sessionId);
+    localStorage.setItem(this.SESSIONS_KEY, JSON.stringify(filteredSessions));
+  }
+
   private getSessions(): Session[] {
     const sessionsJson = localStorage.getItem(this.SESSIONS_KEY);
     return sessionsJson ? JSON.parse(sessionsJson) : [];
@@ -80,6 +86,12 @@ export class LocalStorageCommentRepository implements CommentRepository {
       }));
   }
 
+  async deleteComment(commentId: string): Promise<void> {
+    const comments = this.getComments();
+    const filteredComments = comments.filter(c => c.commentId !== commentId);
+    localStorage.setItem(this.COMMENTS_KEY, JSON.stringify(filteredComments));
+  }
+
   private getComments(): Comment[] {
     const commentsJson = localStorage.getItem(this.COMMENTS_KEY);
     return commentsJson ? JSON.parse(commentsJson) : [];
@@ -98,6 +110,12 @@ export class LocalStoragePictureRepository implements PictureRepository {
   async getPictureById(pictureId: string): Promise<Picture | null> {
     const pictures = this.getPictures();
     return pictures.find(p => p.pictureId === pictureId) || null;
+  }
+
+  async deletePicture(pictureId: string): Promise<void> {
+    const pictures = this.getPictures();
+    const filteredPictures = pictures.filter(p => p.pictureId !== pictureId);
+    localStorage.setItem(this.PICTURES_KEY, JSON.stringify(filteredPictures));
   }
 
   private getPictures(): Picture[] {

@@ -6,16 +6,19 @@ export interface SessionRepository {
   getSessionById(sessionId: string): Promise<Session | null>;
   getAllSessions(): Promise<Session[]>;
   updateSession(session: Session): Promise<void>;
+  deleteSession(sessionId: string): Promise<void>;
 }
 
 export interface CommentRepository {
   saveComment(comment: Comment): Promise<void>;
   getCommentsBySessionId(sessionId: string): Promise<Comment[]>;
+  deleteComment(commentId: string): Promise<void>;
 }
 
 export interface PictureRepository {
   savePicture(picture: Picture): Promise<void>;
   getPictureById(pictureId: string): Promise<Picture | null>;
+  deletePicture(pictureId: string): Promise<void>;
 }
 
 export interface TimeService {
@@ -179,5 +182,29 @@ export class SessionUseCases {
 
   async getPicture(pictureId: string): Promise<Picture | null> {
     return this.pictureRepository.getPictureById(pictureId);
+  }
+
+  async deleteSession(sessionId: string): Promise<void> {
+    const session = await this.sessionRepository.getSessionById(sessionId);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    // Delete associated pictures
+    if (session.beforePictureId) {
+      await this.pictureRepository.deletePicture(session.beforePictureId);
+    }
+    if (session.afterPictureId) {
+      await this.pictureRepository.deletePicture(session.afterPictureId);
+    }
+
+    // Delete associated comments
+    const comments = await this.commentRepository.getCommentsBySessionId(sessionId);
+    for (const comment of comments) {
+      await this.commentRepository.deleteComment(comment.commentId);
+    }
+
+    // Delete the session
+    await this.sessionRepository.deleteSession(sessionId);
   }
 }

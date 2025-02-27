@@ -125,7 +125,6 @@
       <CommentList comments={session.comments} />
     </div>
   {/if}
-  }
 </div>
 
 <style>

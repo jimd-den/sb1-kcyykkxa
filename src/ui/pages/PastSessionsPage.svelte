@@ -45,6 +45,19 @@
   function startNewSession() {
     dispatch('startNewSession');
   }
+
+  async function deleteSession(event: Event, sessionId: string) {
+    event.stopPropagation(); // Prevent navigation to session details
+    if (confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
+      try {
+        await sessionService.deleteSession(sessionId);
+        await loadSessions(); // Refresh the list
+      } catch (err) {
+        console.error('Error deleting session:', err);
+        error = err instanceof Error ? err.message : 'Failed to delete session';
+      }
+    }
+  }
 </script>
 
 <div class="past-sessions-page">
@@ -71,18 +84,26 @@
   {:else}
     <div class="sessions-list">
       {#each sessions as session}
-        <div class="session-card" on:click={() => viewSessionDetails(session.sessionId)}>
+        <div class="session-card">
           <div class="session-header">
             <h3>{session.title}</h3>
-            <span class="session-date">{formatDate(session.startTime)}</span>
+            <div class="session-actions">
+              <span class="session-date">{formatDate(session.startTime)}</span>
+              <button 
+                class="delete-button" 
+                on:click={(e) => deleteSession(e, session.sessionId)}
+                title="Delete session"
+              >
+                ×
+              </button>
+            </div>
           </div>
-          <div class="session-details">
+          <div class="session-details" on:click={() => viewSessionDetails(session.sessionId)}>
             <div class="session-time">
               Started: {formatTime(session.startTime)}
               {#if session.endTime}
                 <br>Ended: {formatTime(session.endTime)}
               {/if}
-              }
             </div>
             <div class="session-goal">
               Goal: {session.goalTime} minutes
@@ -93,10 +114,8 @@
           </div>
         </div>
       {/each}
-      }
     </div>
   {/if}
-  }
 </div>
 
 <style>
@@ -189,6 +208,31 @@
   .session-date {
     font-size: 0.8rem;
     color: #666;
+  }
+
+  .session-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .delete-button {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .delete-button:hover {
+    background-color: #dc35451a;
+  }
+
+  .session-details {
+    cursor: pointer;
   }
   
   .session-details {

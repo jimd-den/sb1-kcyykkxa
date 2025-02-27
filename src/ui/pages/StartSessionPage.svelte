@@ -53,7 +53,7 @@
   {#if error}
     <div class="error-message">{error}</div>
   {/if}
-  }
+  
   
   <div class="form-group">
     <label for="title">Session Title</label>
@@ -90,7 +90,7 @@
     {:else}
       <CameraCapture on:capture={handleCapture} />
     {/if}
-    }
+  
   </div>
   
   <div class="form-actions">

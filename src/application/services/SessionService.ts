@@ -36,6 +36,10 @@ export class SessionService {
     return this.sessionUseCases.getPicture(pictureId);
   }
 
+  async deleteSession(sessionId: string): Promise<void> {
+    await this.sessionUseCases.deleteSession(sessionId);
+  }
+
   // Helper methods for UI presentation
   formatDuration(startTime: Date, endTime?: Date): string {
     const end = endTime || new Date();
