@@ -1,47 +1,74 @@
-# Svelte + TS + Vite
+# Session Tracker
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+## Project Description
 
-## Recommended IDE Setup
+Session Tracker is an application designed to help users track and manage their sessions. Users can start a new session, add comments and pictures during the session, and view past sessions with detailed information.
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## Features and Functionalities
 
-## Need an official Svelte framework?
+- Start a new session with a title and goal time
+- Add comments and pictures during the session
+- Track session progress with a timer and progress bar
+- Pause and resume sessions
+- End sessions and add an optional after picture
+- View past sessions with detailed information, including comments and pictures
+- Delete past sessions
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+## Instructions
 
-## Technical considerations
+### Starting a New Session
 
-**Why use this over SvelteKit?**
+1. Click on "Start New Session" on the home page.
+2. Enter a session title and goal time.
+3. Optionally, add a before picture.
+4. Click "Start Session" to begin.
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+### Adding Comments and Pictures
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+1. During a session, enter a comment in the text area.
+2. Optionally, add a picture by clicking "📷 Add Image".
+3. Click "Add Comment" to save the comment and picture.
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+### Tracking Progress
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+1. Use the progress buttons to update the session progress.
+2. The progress bar will reflect the current progress.
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+### Pausing and Resuming Sessions
 
-**Why include `.vscode/extensions.json`?**
+1. Click "Pause" to pause the session.
+2. Click "Resume" to continue the session.
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+### Ending a Session
 
-**Why enable `allowJs` in the TS template?**
+1. Click "End Session" to finish the session.
+2. Optionally, add an after picture.
+3. Click "Complete Session" to save the session.
 
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
+### Viewing Past Sessions
 
-**Why is HMR not preserving my local component state?**
+1. Click on a session in the "Your Sessions" list to view details.
+2. View comments, pictures, and session information.
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
+### Deleting Past Sessions
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+1. Click the delete button (×) on a session card to delete the session.
 
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+## Dependencies
+
+- `@sveltejs/vite-plugin-svelte`: ^3.1.2
+- `@tsconfig/svelte`: ^5.0.4
+- `svelte`: ^4.2.19
+- `svelte-check`: ^3.8.6
+- `tslib`: ^2.7.0
+- `typescript`: ^5.5.3
+- `vite`: ^5.4.2
+- `svelte-routing`: ^2.13.0
+- `uuid`: ^9.0.1
+
+## Scripts
+
+- `dev`: Start the development server using Vite.
+- `build`: Build the application for production.
+- `preview`: Preview the production build.
+- `check`: Run type checking using `svelte-check` and `tsc`.
