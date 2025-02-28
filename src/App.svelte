@@ -78,7 +78,9 @@
     {:else if currentPage === AppPage.SESSION_DETAIL}
       <SessionDetailPage 
         sessionId={currentSessionId} 
-        on:back={navigateToPastSessions} 
+        on:back={navigateToPastSessions}
+        on:continueSession={handleContinueSession}
+        on:endSession={navigateToEndSession}
       />
     {/if}
   </div>

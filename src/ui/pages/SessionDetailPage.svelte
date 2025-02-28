@@ -59,6 +59,14 @@
   function goBack() {
     dispatch('back');
   }
+  
+  function continueSession() {
+    dispatch('continueSession', { sessionId });
+  }
+  
+  function endSession() {
+    dispatch('endSession', { sessionId });
+  }
 </script>
 
 <div class="session-detail-page">
@@ -86,7 +94,6 @@
           <span class="value">{formatDate(session.endTime)}</span>
         </div>
       {/if}
-      }
       
       <div class="info-item">
         <span class="label">Duration:</span>
@@ -106,6 +113,24 @@
       </div>
     </div>
     
+    {#if session.sessionStatus !== SessionStatus.ENDED}
+      <div class="session-actions">
+        <button 
+          class="continue-button" 
+          on:click={continueSession}
+        >
+          Continue Session
+        </button>
+        
+        <button 
+          class="end-button" 
+          on:click={endSession}
+        >
+          Finish Session
+        </button>
+      </div>
+    {/if}
+    
     <div class="pictures-container">
       <div class="picture-box">
         <h3>Before</h3>
@@ -114,7 +139,6 @@
         {:else}
           <div class="no-picture">No before picture available</div>
         {/if}
-      
       </div>
       
       <div class="picture-box">
@@ -175,7 +199,44 @@
     background-color: #f9f9f9;
     border-radius: 8px;
     padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .session-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
     margin-bottom: 2rem;
+  }
+  
+  .continue-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .continue-button:hover {
+    background-color: #0069d9;
+  }
+  
+  .end-button {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .end-button:hover {
+    background-color: #c9302c;
   }
   
   .info-item {
