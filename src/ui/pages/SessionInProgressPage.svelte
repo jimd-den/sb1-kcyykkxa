@@ -217,10 +217,11 @@
         {/each}
         <button 
           class="progress-button reset-button"
-          on:click={() => {
+          on:click={async () => {
             if (confirm('Are you sure you want to reset progress to 0%?')) {
+              await addComment("Progress reset to 0%");
               currentProgress = 0;
-              addComment("Progress reset to 0%");
+              await loadSession();
             }
           }}
           disabled={session.sessionStatus === SessionStatus.PAUSED || currentProgress === 0}
