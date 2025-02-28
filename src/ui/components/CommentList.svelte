@@ -6,6 +6,11 @@
   function formatTimestamp(timestamp: Date): string {
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
+
+  // Create a sorted copy of comments to display newest first
+  $: sortedComments = [...comments].sort((a, b) => 
+    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
 </script>
 
 <div class="comment-list">
@@ -14,7 +19,7 @@
     <p class="no-comments">No comments yet</p>
   {:else}
     <ul>
-      {#each comments as comment}
+      {#each sortedComments as comment}
         <li class="comment-item">
           <div class="comment-time">{formatTimestamp(comment.timestamp)}</div>
           <div class="comment-text">{comment.text}</div>

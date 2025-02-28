@@ -20,6 +20,7 @@
   let showCamera = false;
   let capturedImage: string | null = null;
   let currentProgress = 0;
+  let showTimwoodsOverlay = false;
   
   // Define keys for the TIMWOODS comments
   type TimwoodsKey = 'transportation' | 'inventory' | 'motion' | 'waiting' | 
@@ -53,9 +54,16 @@
       
       // Set initial progress by scanning existing comments
       if (session?.comments) {
+        // Look for both old and new format of progress comments
         const progressRegex = /(\d+)% of task completed/;
+        const progressRegexDetailed = /(\d+)% of task completed \((\d+)\/100\)/;
+        
         for (const comment of session.comments) {
-          const match = comment.text.match(progressRegex);
+          let match = comment.text.match(progressRegexDetailed);
+          if (!match) {
+            match = comment.text.match(progressRegex);
+          }
+          
           if (match && match[1]) {
             const progress = parseInt(match[1], 10);
             if (!isNaN(progress) && progress > currentProgress) {
@@ -123,13 +131,24 @@
   }
   
   function addProgressComment(percentage: number) {
-    // Update the current progress
-    currentProgress = percentage;
-    addComment(`${percentage}% of task completed (${percentage}/100)`);
+    // Increment the progress instead of just setting it
+    // This way clicking 5% multiple times will increase by 5% each time
+    const newProgress = Math.min(currentProgress + percentage, 100);
+    currentProgress = newProgress;
+    addComment(`${newProgress}% of task completed (${newProgress}/100)`);
   }
   
   function addTimwoodsComment(wasteType: TimwoodsKey) {
     addComment(timwoodsComments[wasteType]);
+    showTimwoodsOverlay = false;
+  }
+  
+  function toggleAndonOverlay() {
+    showTimwoodsOverlay = !showTimwoodsOverlay;
+  }
+  
+  function closeOverlay() {
+    showTimwoodsOverlay = false;
   }
 </script>
 
@@ -159,6 +178,14 @@
       </button>
       
       <button 
+        class="andon-button" 
+        on:click={toggleAndonOverlay}
+        disabled={session.sessionStatus === SessionStatus.PAUSED}
+      >
+        Andon
+      </button>
+      
+      <button 
         class="end-button" 
         on:click={endSession}
       >
@@ -167,7 +194,7 @@
     </div>
     
     <div class="progress-section">
-      <h3>Progress Tracker ({currentProgress}%)</h3>
+      <h3>Progress Tracker ({currentProgress}/100)</h3>
       <div class="progress-bar">
         <div class="progress-fill" style="width: {currentProgress}%;"></div>
       </div>
@@ -176,72 +203,20 @@
           <button 
             class="progress-button"
             on:click={() => addProgressComment(percentage)}
-            disabled={session.sessionStatus === SessionStatus.PAUSED}
+            disabled={session.sessionStatus === SessionStatus.PAUSED || currentProgress >= 100}
           >
-            {percentage}%
+            +{percentage}%
           </button>
         {/each}
-      </div>
-    </div>
-    
-    <div class="timwoods-section">
-      <h3>Six Sigma TIMWOODS</h3>
-      <div class="timwoods-buttons">
         <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('transportation')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
+          class="progress-button reset-button"
+          on:click={() => {
+            currentProgress = 0;
+            addComment("Progress reset to 0%");
+          }}
+          disabled={session.sessionStatus === SessionStatus.PAUSED || currentProgress === 0}
         >
-          Transportation
-        </button>
-        <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('inventory')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
-        >
-          Inventory
-        </button>
-        <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('motion')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
-        >
-          Motion
-        </button>
-        <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('waiting')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
-        >
-          Waiting
-        </button>
-        <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('overproduction')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
-        >
-          Overproduction
-        </button>
-        <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('overprocessing')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
-        >
-          Overprocessing
-        </button>
-        <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('defects')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
-        >
-          Defects
-        </button>
-        <button 
-          class="timwoods-button"
-          on:click={() => addTimwoodsComment('skills')}
-          disabled={session.sessionStatus === SessionStatus.PAUSED}
-        >
-          Skills
+          Reset
         </button>
       </div>
     </div>
@@ -299,6 +274,75 @@
       
       <CommentList comments={session.comments} />
     </div>
+    
+    <!-- TIMWOODS overlay -->
+    {#if showTimwoodsOverlay}
+      <div class="overlay" on:click={closeOverlay}>
+        <div class="overlay-content" on:click|stopPropagation>
+          <h2>Six Sigma TIMWOODS</h2>
+          <p class="overlay-description">Select a waste type to report:</p>
+          <div class="timwoods-grid">
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('transportation')}
+            >
+              <span class="timwoods-letter">T</span>
+              <span>Transportation</span>
+            </button>
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('inventory')}
+            >
+              <span class="timwoods-letter">I</span>
+              <span>Inventory</span>
+            </button>
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('motion')}
+            >
+              <span class="timwoods-letter">M</span>
+              <span>Motion</span>
+            </button>
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('waiting')}
+            >
+              <span class="timwoods-letter">W</span>
+              <span>Waiting</span>
+            </button>
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('overproduction')}
+            >
+              <span class="timwoods-letter">O</span>
+              <span>Overproduction</span>
+            </button>
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('overprocessing')}
+            >
+              <span class="timwoods-letter">O</span>
+              <span>Overprocessing</span>
+            </button>
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('defects')}
+            >
+              <span class="timwoods-letter">D</span>
+              <span>Defects</span>
+            </button>
+            <button 
+              class="timwoods-button"
+              on:click={() => addTimwoodsComment('skills')}
+            >
+              <span class="timwoods-letter">S</span>
+              <span>Skills</span>
+            </button>
+          </div>
+          <button class="close-overlay-button" on:click={closeOverlay}>Close</button>
+        </div>
+      </div>
+    {/if}
   {/if}
 </div>
 
@@ -307,6 +351,7 @@
     max-width: 600px;
     margin: 0 auto;
     padding: 1rem;
+    position: relative;
   }
   
   h1 {
@@ -342,7 +387,7 @@
     margin: 1.5rem 0;
   }
   
-  .pause-button, .end-button {
+  .pause-button, .end-button, .andon-button {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 4px;
@@ -360,7 +405,16 @@
     color: white;
   }
   
-  .progress-section, .timwoods-section {
+  .andon-button {
+    background-color: #5cb85c;
+    color: white;
+  }
+  
+  .andon-button:hover {
+    background-color: #4cae4c;
+  }
+  
+  .progress-section {
     margin-top: 1.5rem;
   }
 
@@ -379,7 +433,7 @@
     transition: width 0.3s ease;
   }
   
-  .progress-buttons, .timwoods-buttons {
+  .progress-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -400,19 +454,12 @@
     background-color: #46b8da;
   }
   
-  .timwoods-button {
-    flex: 1 0 calc(50% - 0.5rem);
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    background-color: #337ab7;
-    color: white;
-    cursor: pointer;
-    margin-bottom: 0.5rem;
+  .reset-button {
+    background-color: #f0ad4e;
   }
   
-  .timwoods-button:hover {
-    background-color: #286090;
+  .reset-button:hover {
+    background-color: #ec971f;
   }
   
   .comment-section {
@@ -463,7 +510,8 @@
   }
   
   .add-comment-button:disabled, .add-image-button:disabled, 
-  .progress-button:disabled, .timwoods-button:disabled {
+  .progress-button:disabled, .timwoods-button:disabled,
+  .andon-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
   }
@@ -513,5 +561,94 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+  }
+  
+  /* Overlay styles */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .overlay-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 90%;
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .overlay-content h2 {
+    text-align: center;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .overlay-description {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+  
+  .timwoods-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .timwoods-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #337ab7;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.3s ease;
+  }
+  
+  .timwoods-button:hover {
+    background-color: #286090;
+    transform: scale(1.02);
+  }
+  
+  .timwoods-button:active {
+    transform: scale(0.98);
+  }
+  
+  .timwoods-letter {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .close-overlay-button {
+    display: block;
+    margin: 0 auto;
+    padding: 0.75rem 1.5rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .close-overlay-button:hover {
+    background-color: #5a6268;
   }
 </style>
