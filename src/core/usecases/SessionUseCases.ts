@@ -74,7 +74,7 @@ export class SessionUseCases {
     return session;
   }
 
-  async addComment(sessionId: string, text: string): Promise<Comment> {
+  async addComment(sessionId: string, text: string, pictureData?: string): Promise<Comment> {
     const session = await this.sessionRepository.getSessionById(sessionId);
     if (!session) {
       throw new Error('Session not found');
@@ -88,7 +88,8 @@ export class SessionUseCases {
       commentId: this.idGenerator.generate(),
       sessionId,
       timestamp: this.timeService.getCurrentTime(),
-      text
+      text,
+      pictureData
     };
 
     await this.commentRepository.saveComment(comment);

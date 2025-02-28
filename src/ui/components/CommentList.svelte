@@ -18,6 +18,11 @@
         <li class="comment-item">
           <div class="comment-time">{formatTimestamp(comment.timestamp)}</div>
           <div class="comment-text">{comment.text}</div>
+          {#if comment.pictureData}
+            <div class="comment-image">
+              <img src={comment.pictureData} alt="Comment attachment" />
+            </div>
+          {/if}
         </li>
       {/each}
       
@@ -70,5 +75,13 @@
   
   .comment-text {
     word-break: break-word;
+    margin-bottom: 0.5rem;
+  }
+  
+  .comment-image img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 4px;
+    margin-top: 0.5rem;
   }
 </style>

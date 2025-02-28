@@ -8,8 +8,8 @@ export class SessionService {
     return this.sessionUseCases.startSession(title, goalTime, beforePictureData);
   }
 
-  async addComment(sessionId: string, text: string): Promise<Comment> {
-    return this.sessionUseCases.addComment(sessionId, text);
+  async addComment(sessionId: string, text: string, pictureData?: string): Promise<Comment> {
+    return this.sessionUseCases.addComment(sessionId, text, pictureData);
   }
 
   async pauseSession(sessionId: string): Promise<Session> {

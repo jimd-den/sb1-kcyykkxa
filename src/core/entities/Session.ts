@@ -21,6 +21,7 @@ export interface Comment {
   sessionId: string;
   timestamp: Date;
   text: string;
+  pictureData?: string; // Base64 encoded image data for comment
 }
 
 export interface Picture {
