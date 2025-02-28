@@ -47,6 +47,11 @@
   function handleSessionEnded() {
     navigateToPastSessions();
   }
+  
+  function handleContinueSession(event: CustomEvent) {
+    currentSessionId = event.detail.sessionId;
+    currentPage = AppPage.SESSION_IN_PROGRESS;
+  }
 </script>
 
 <main>
@@ -56,12 +61,14 @@
     {:else if currentPage === AppPage.SESSION_IN_PROGRESS}
       <SessionInProgressPage 
         sessionId={currentSessionId} 
-        on:endSession={navigateToEndSession} 
+        on:endSession={navigateToEndSession}
+        on:goHome={navigateToPastSessions} 
       />
     {:else if currentPage === AppPage.END_SESSION}
       <EndSessionPage 
         sessionId={currentSessionId} 
         on:sessionEnded={handleSessionEnded} 
+        on:continueSession={handleContinueSession}
       />
     {:else if currentPage === AppPage.PAST_SESSIONS}
       <PastSessionsPage 

@@ -130,6 +130,10 @@
     dispatch('endSession', { sessionId });
   }
   
+  function goToHome() {
+    dispatch('goHome');
+  }
+  
   function addProgressComment(percentage: number) {
     // Increment the progress instead of just setting it
     // This way clicking 5% multiple times will increase by 5% each time
@@ -161,7 +165,10 @@
       <button on:click={loadSession}>Retry</button>
     </div>
   {:else if session}
-    <h1>{session.title}</h1>
+    <div class="header-with-nav">
+      <button class="back-button" on:click={goToHome}>← Home</button>
+      <h1>{session.title}</h1>
+    </div>
     
     <SessionTimer 
       startTime={session.startTime} 
@@ -229,7 +236,6 @@
             on:capture={handleImageCapture}
             on:skip={cancelImageCapture}
             optional={true}
-            autoStart={true}
           />
           <button class="cancel-button" on:click={cancelImageCapture}>
             Cancel
@@ -354,9 +360,31 @@
     position: relative;
   }
   
+  .header-with-nav {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  .back-button {
+    position: absolute;
+    left: 0;
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 4px;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  .back-button:hover {
+    background-color: #e0e0e0;
+  }
+  
   h1 {
     text-align: center;
-    margin-bottom: 1.5rem;
+    width: 100%;
   }
   
   h3 {

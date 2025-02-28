@@ -15,7 +15,7 @@
   function handleCapture(event: CustomEvent) {
     afterPictureData = event.detail.imageData;
   }
-
+  
   function handleSkip() {
     afterPictureData = '';
   }
@@ -33,6 +33,10 @@
     } finally {
       isEnding = false;
     }
+  }
+  
+  function continueSession() {
+    dispatch('continueSession', { sessionId });
   }
 </script>
 
@@ -62,6 +66,14 @@
   </div>
   
   <div class="form-actions">
+    <button 
+      class="continue-button" 
+      on:click={continueSession} 
+      disabled={isEnding}
+    >
+      Continue Session
+    </button>
+    
     <button 
       class="complete-button" 
       on:click={completeSession} 
@@ -118,6 +130,7 @@
   .form-actions {
     display: flex;
     justify-content: center;
+    gap: 1rem;
     margin-top: 2rem;
   }
   
@@ -136,7 +149,22 @@
     background-color: #45a049;
   }
   
-  .complete-button:disabled {
+  .continue-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .continue-button:hover:not(:disabled) {
+    background-color: #0069d9;
+  }
+  
+  .complete-button:disabled, .continue-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
   }
