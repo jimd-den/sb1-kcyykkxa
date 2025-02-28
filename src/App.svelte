@@ -17,6 +17,8 @@
 
   let currentPage = AppPage.PAST_SESSIONS;
   let currentSessionId = '';
+  let deferredPrompt: any = null;
+  let showInstallPrompt = false;
 
   // Navigation functions
   function navigateToStartSession() {
@@ -52,9 +54,48 @@
     currentSessionId = event.detail.sessionId;
     currentPage = AppPage.SESSION_IN_PROGRESS;
   }
+
+  // PWA installation
+  onMount(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      showInstallPrompt = true;
+    });
+  });
+
+  async function installApp() {
+    if (!deferredPrompt) return;
+    
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('PWA installed');
+    }
+    
+    deferredPrompt = null;
+    showInstallPrompt = false;
+  }
+
+  function dismissInstall() {
+    showInstallPrompt = false;
+  }
 </script>
 
 <main>
+  {#if showInstallPrompt}
+    <div class="install-prompt">
+      <div class="install-content">
+        <p>Add this app to your home screen for quick access!</p>
+        <div class="install-actions">
+          <button class="install-button" on:click={installApp}>Install</button>
+          <button class="dismiss-button" on:click={dismissInstall}>Not Now</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
   <div class="app-container">
     {#if currentPage === AppPage.START_SESSION}
       <StartSessionPage on:sessionStarted={navigateToSessionInProgress} />
@@ -96,14 +137,67 @@
   }
 
   main {
-    width: 100%;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    position: relative;
   }
 
   .app-container {
-    flex: 1;
     padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .install-prompt {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    z-index: 1000;
+  }
+
+  .install-content {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .install-content p {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .install-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .install-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .dismiss-button {
+    background-color: transparent;
+    border: 1px solid #666;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .install-button:hover {
+    background-color: #45a049;
+  }
+
+  .dismiss-button:hover {
+    background-color: #f5f5f5;
   }
 </style>

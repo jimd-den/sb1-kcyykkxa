@@ -218,8 +218,10 @@
         <button 
           class="progress-button reset-button"
           on:click={() => {
-            currentProgress = 0;
-            addComment("Progress reset to 0%");
+            if (confirm('Are you sure you want to reset progress to 0%?')) {
+              currentProgress = 0;
+              addComment("Progress reset to 0%");
+            }
           }}
           disabled={session.sessionStatus === SessionStatus.PAUSED || currentProgress === 0}
         >

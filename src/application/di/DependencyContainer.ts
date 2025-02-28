@@ -1,10 +1,10 @@
 import { SessionUseCases } from '../../core/usecases/SessionUseCases';
 import { SessionService } from '../services/SessionService';
 import { 
-  LocalStorageSessionRepository, 
-  LocalStorageCommentRepository, 
-  LocalStoragePictureRepository 
-} from '../../frameworks_drivers/repositories/LocalStorageSessionRepository';
+  IndexedDBSessionRepository, 
+  IndexedDBCommentRepository, 
+  IndexedDBPictureRepository 
+} from '../../frameworks_drivers/repositories/IndexedDBRepository';
 import { 
   BrowserTimeService, 
   UuidGenerator 
@@ -15,9 +15,9 @@ import { CameraService } from '../../frameworks_drivers/services/CameraService';
 export class DependencyContainer {
   private static instance: DependencyContainer;
   
-  private sessionRepository = new LocalStorageSessionRepository();
-  private commentRepository = new LocalStorageCommentRepository();
-  private pictureRepository = new LocalStoragePictureRepository();
+  private sessionRepository = new IndexedDBSessionRepository();
+  private commentRepository = new IndexedDBCommentRepository();
+  private pictureRepository = new IndexedDBPictureRepository();
   private timeService = new BrowserTimeService();
   private idGenerator = new UuidGenerator();
   private cameraService = new CameraService();
